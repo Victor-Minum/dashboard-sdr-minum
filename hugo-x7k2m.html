@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Minum · Desempenho — Hugo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--dark:#083B31;--mint:#00C896;--med:#0D5C47;--light:#EAF5F1;--card:#C5E8DF;--txt:#1A2E28;--sub:#5C7268;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Calibri,'Segoe UI',Arial,sans-serif;}
+body{background:var(--dark);min-height:100vh;color:#fff;}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px 60px;}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:6px;}
+.logo{font-size:26px;font-weight:bold;color:var(--mint);letter-spacing:.5px;}
+.logo span{color:#fff;font-weight:normal;}
+.sels{display:flex;gap:10px;}
+h1{font-size:30px;margin:14px 0 2px;}
+h1 em{color:var(--mint);font-style:normal;}
+.sub{color:#9dc4b8;font-size:14px;margin-bottom:22px;}
+select{background:var(--med);color:#fff;border:1px solid var(--mint);border-radius:8px;padding:9px 14px;font-size:15px;cursor:pointer;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;}
+@media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr);}}
+.kpi{background:var(--med);border-radius:14px;padding:18px 16px;}
+.kpi .v{font-size:30px;font-weight:bold;color:var(--mint);}
+.kpi .l{font-size:13px;color:#cfe8df;margin-top:4px;}
+.section{background:var(--light);color:var(--txt);border-radius:16px;padding:22px;margin-bottom:22px;}
+.section h2{font-size:19px;margin-bottom:14px;color:var(--dark);}
+.bonusgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;}
+.bcard{background:var(--card);border-radius:12px;padding:16px;}
+.bcard .t{font-weight:bold;font-size:14px;margin-bottom:8px;}
+.bar{background:#fff;border-radius:20px;height:14px;overflow:hidden;margin:8px 0 6px;}
+.bar>div{height:100%;background:var(--mint);border-radius:20px;transition:width .4s;}
+.small{font-size:12px;color:var(--sub);}
+.nivel{font-size:14px;font-weight:bold;color:var(--dark);display:flex;align-items:center;}
+.big{font-size:28px;font-weight:bold;color:var(--dark);}
+.info{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:var(--dark);color:#fff;font-size:11px;font-weight:bold;cursor:help;position:relative;margin-left:7px;flex-shrink:0;}
+.info .tip{visibility:hidden;opacity:0;position:absolute;bottom:135%;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:10px 12px;border-radius:8px;font-size:12px;font-weight:normal;width:240px;line-height:1.5;z-index:10;transition:opacity .15s;box-shadow:0 4px 14px rgba(0,0,0,.25);}
+.info:hover .tip{visibility:visible;opacity:1;}
+.total{background:#fff;border-radius:12px;padding:16px;text-align:center;}
+canvas{max-height:300px;}
+.chart-wrap{background:#fff;border-radius:12px;padding:14px;margin-top:12px;}
+footer{color:#6f978a;font-size:12px;text-align:center;margin-top:10px;}
+@media(max-width:600px){h1{font-size:24px}.kpi .v{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">minum<span> · pré-vendas</span></div>
+  <div class="sels">
+    <select id="selSdr" style="display:none;"></select>
+    <select id="selMes"></select>
+  </div>
+</header>
+<h1 id="titulo"></h1>
+<div class="sub" id="subTitulo"></div>
+
+<div class="grid" id="kpis"></div>
+
+<div class="section">
+  <h2 id="tituloBonus">Níveis do mês</h2>
+  <div class="bonusgrid" id="bonus"></div>
+</div>
+
+<div class="section">
+  <h2>Histórico</h2>
+  <div class="grid" id="totais"></div>
+  <div class="chart-wrap"><canvas id="chartRM"></canvas></div>
+  <div class="chart-wrap"><canvas id="chartValores"></canvas></div>
+  <div class="chart-wrap"><canvas id="chartQtd"></canvas></div>
+</div>
+<footer id="rodape"></footer>
+</div>
+<script>
+const D = {"titulo": "Hugo", "mes_atual": "2026-07", "gerado_em": "16/07/2026 09:45", "padrao": "hugo", "vistas": [{"id": "hugo", "nome": "Hugo", "is_geral": false, "serie": [{"mes": "2025-05", "label": "mai/2025", "leads": 51, "reunioes": 1, "assinados": 1, "validados": 0, "atividades": 11, "taxa": 2.0, "ticket": 3059.1, "fator": 0.75, "valor_assinado": 3059.1, "valor_validado": 0.0, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}, {"mes": "2025-06", "label": "jun/2025", "leads": 102, "reunioes": 7, "assinados": 2, "validados": 1, "atividades": 171, "taxa": 6.9, "ticket": 2938.72, "fator": 0.75, "valor_assinado": 14202.46, "valor_validado": 8525.95, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}, {"mes": "2025-07", "label": "jul/2025", "leads": 65, "reunioes": 6, "assinados": 2, "validados": 3, "atividades": 101, "taxa": 9.2, "ticket": 9458.14, "fator": 1.25, "valor_assinado": 4286.79, "valor_validado": 10253.75, "bonus_reunioes": 0, "bonus_fechamentos": 150, "bonus": 187.5}, {"mes": "2025-08", "label": "ago/2025", "leads": 107, "reunioes": 12, "assinados": 0, "validados": 1, "atividades": 236, "taxa": 11.2, "ticket": 5702.51, "fator": 1.25, "valor_assinado": 0.0, "valor_validado": 2768.65, "bonus_reunioes": 250, "bonus_fechamentos": 0, "bonus": 312.5}, {"mes": "2025-09", "label": "set/2025", "leads": 130, "reunioes": 30, "assinados": 6, "validados": 0, "atividades": 363, "taxa": 23.1, "ticket": 4719.77, "fator": 1.25, "valor_assinado": 34330.2, "valor_validado": 0.0, "bonus_reunioes": 1500, "bonus_fechamentos": 0, "bonus": 1875.0}, {"mes": "2025-10", "label": "out/2025", "leads": 126, "reunioes": 33, "assinados": 9, "validados": 8, "atividades": 382, "taxa": 26.2, "ticket": 5150.42, "fator": 1.25, "valor_assinado": 65673.28, "valor_validado": 46801.63, "bonus_reunioes": 1500, "bonus_fechamentos": 450, "bonus": 2437.5}, {"mes": "2025-11", "label": "nov/2025", "leads": 149, "reunioes": 30, "assinados": 7, "validados": 3, "atividades": 323, "taxa": 20.1, "ticket": 5539.01, "fator": 1.25, "valor_assinado": 26051.21, "valor_validado": 17877.92, "bonus_reunioes": 1500, "bonus_fechamentos": 150, "bonus": 2062.5}, {"mes": "2025-12", "label": "dez/2025", "leads": 65, "reunioes": 14, "assinados": 1, "validados": 8, "atividades": 157, "taxa": 21.5, "ticket": 9086.17, "fator": 1.25, "valor_assinado": 3150.35, "valor_validado": 43304.79, "bonus_reunioes": 250, "bonus_fechamentos": 450, "bonus": 875.0}, {"mes": "2026-01", "label": "jan/2026", "leads": 160, "reunioes": 30, "assinados": 7, "validados": 4, "atividades": 429, "taxa": 18.8, "ticket": 5400.44, "fator": 1.25, "valor_assinado": 116091.52, "valor_validado": 63547.54, "bonus_reunioes": 1500, "bonus_fechamentos": 150, "bonus": 2062.5}, {"mes": "2026-02", "label": "fev/2026", "leads": 124, "reunioes": 30, "assinados": 5, "validados": 5, "atividades": 370, "taxa": 24.2, "ticket": 4364.77, "fator": 1.0, "valor_assinado": 43678.07, "valor_validado": 60032.78, "bonus_reunioes": 1500, "bonus_fechamentos": 150, "bonus": 1650.0}, {"mes": "2026-03", "label": "mar/2026", "leads": 200, "reunioes": 30, "assinados": 3, "validados": 5, "atividades": 517, "taxa": 15.0, "ticket": 7140.67, "fator": 1.25, "valor_assinado": 23492.2, "valor_validado": 42932.31, "bonus_reunioes": 1500, "bonus_fechamentos": 150, "bonus": 2062.5}, {"mes": "2026-04", "label": "abr/2026", "leads": 153, "reunioes": 30, "assinados": 8, "validados": 4, "atividades": 490, "taxa": 19.6, "ticket": 5152.25, "fator": 1.25, "valor_assinado": 58944.32, "valor_validado": 55691.82, "bonus_reunioes": 1500, "bonus_fechamentos": 150, "bonus": 2062.5}, {"mes": "2026-05", "label": "mai/2026", "leads": 168, "reunioes": 31, "assinados": 7, "validados": 4, "atividades": 510, "taxa": 18.5, "ticket": 6079.77, "fator": 1.25, "valor_assinado": 27326.89, "valor_validado": 14601.93, "bonus_reunioes": 1500, "bonus_fechamentos": 150, "bonus": 2062.5}, {"mes": "2026-06", "label": "jun/2026", "leads": 1, "reunioes": 0, "assinados": 2, "validados": 3, "atividades": 0, "taxa": 0.0, "ticket": null, "fator": null, "valor_assinado": 16567.1, "valor_validado": 17160.08, "bonus_reunioes": 0, "bonus_fechamentos": 150, "bonus": 0.0}, {"mes": "2026-07", "label": "jul/2026", "leads": 81, "reunioes": 8, "assinados": 0, "validados": 0, "atividades": 157, "taxa": 9.9, "ticket": 8171.29, "fator": 1.25, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}], "totais": {"leads": 1682, "reunioes": 292, "assinados": 60, "validados": 49, "valor_assinado": 436853.49, "valor_validado": 383499.15, "atividades": 4217, "taxa": 17.4}}]};
+const fmtBRL = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
+const fmtBRL2 = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const selSdr = document.getElementById('selSdr');
+const selMes = document.getElementById('selMes');
+let vista = D.vistas.find(v=>v.id===D.padrao);
+let charts = [];
+
+if (D.vistas.length > 1){
+  selSdr.style.display = '';
+  D.vistas.forEach(v=>{const o=document.createElement('option');o.value=v.id;o.textContent=v.nome;selSdr.appendChild(o);});
+  selSdr.value = D.padrao;
+}
+
+const nivelR = n => n>=30?3:n>=20?2:n>=10?1:0;
+const nivelV = n => n>=9?3:n>=6?2:n>=3?1:0;
+const TIP_R = 'Nível 1: 10 a 19 reuniões → R$250<br>Nível 2: 20 a 29 reuniões → R$750<br>Nível 3: 30 ou mais → R$1.500';
+const TIP_V = 'Nível 1: 3 a 5 contratos → R$150<br>Nível 2: 6 a 8 contratos → R$450<br>Nível 3: 9 ou mais → R$900';
+const TIP_T = 'Ticket médio até R$3.500 → fator 0,75x<br>R$3.501 a R$4.500 → fator 1,0x<br>Acima de R$4.500 → fator 1,25x<br><br>O fator multiplica o bônus do período.';
+const info = tip => `<span class="info">i<span class="tip">${tip}</span></span>`;
+
+function fillMeses(){
+  const antes = selMes.value;
+  selMes.innerHTML = '';
+  vista.serie.forEach(m=>{const o=document.createElement('option');o.value=m.mes;o.textContent=m.label;selMes.appendChild(o);});
+  const tem = m => vista.serie.some(x=>x.mes===m);
+  selMes.value = tem(antes) ? antes : (tem(D.mes_atual) ? D.mes_atual : vista.serie[vista.serie.length-1].mes);
+}
+
+function render(){
+  const m = vista.serie.find(x=>x.mes===selMes.value);
+  const atual = m.mes === D.mes_atual;
+  document.getElementById('titulo').innerHTML = D.vistas.length===1
+    ? `Olá, <em>${vista.nome}</em>!`
+    : (vista.is_geral ? `Visão <em>Geral</em> do time` : `Visão de <em>${vista.nome}</em>`);
+  const kpis = [
+    [m.leads,'Leads trabalhados'],[m.reunioes,'Reuniões marcadas'],
+    [m.taxa!==null?m.taxa+'%':'—','Taxa de marcação'],[m.atividades,'Atividades (Tentativas de Contato)'],
+    [m.assinados,'Contratos assinados'],[fmtBRL(m.valor_assinado),'Valor contratos assinados'],
+    [m.validados,'Contratos validados'],[fmtBRL(m.valor_validado),'Valor contratos validados'],
+  ];
+  document.getElementById('kpis').innerHTML = kpis.map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  document.getElementById('subTitulo').textContent = `Resultados de ${m.label} · atualizado em ${D.gerado_em}`;
+  document.getElementById('tituloBonus').textContent = (atual?'Bonificação — ':'Níveis — ')+m.label;
+
+  const fatorTxt = m.fator ? m.fator.toLocaleString('pt-BR')+'x' : '—';
+  const ticketTxt = m.ticket ? fmtBRL2(m.ticket) : '—';
+  const obsTicket = atual ? '' : `<div class="small" style="margin-top:6px;">Este valor pode ter sido alterado em relação ao valor do seu relatório de bonificação oficial recebido por e-mail.</div>`;
+  let html = '';
+  if (!vista.is_geral){
+    const pR = Math.min(100, m.reunioes/30*100), pF = Math.min(100, m.validados/9*100);
+    html += `
+    <div class="bcard"><div class="t">Reuniões marcadas: ${m.reunioes}</div>
+      <div class="bar"><div style="width:${pR}%"></div></div>
+      <div class="nivel">Nível ${nivelR(m.reunioes)} alcançado ${info(TIP_R)}</div></div>
+    <div class="bcard"><div class="t">Contratos validados: ${m.validados}</div>
+      <div class="bar"><div style="width:${pF}%"></div></div>
+      <div class="nivel">Nível ${nivelV(m.validados)} alcançado ${info(TIP_V)}</div></div>
+    <div class="bcard"><div class="t">Ticket médio das reuniões</div>
+      <div class="big">${ticketTxt}</div>
+      <div class="nivel">Fator: ${fatorTxt} ${info(TIP_T)}</div>${obsTicket}</div>`;
+    if (atual) html += `
+    <div class="bcard" style="background:var(--dark);color:#fff;"><div class="t" style="color:var(--mint);">Bônus do mês (parcial)</div>
+      <div class="big" style="color:var(--mint);">${fmtBRL2(m.bonus)}</div>
+      <div class="small" style="color:#9dc4b8;">(R$${m.bonus_reunioes} reuniões + R$${m.bonus_fechamentos} contratos validados) × ${fatorTxt}</div></div>`;
+  } else {
+    html += `
+    <div class="bcard"><div class="t">Ticket médio das reuniões (time)</div>
+      <div class="big">${ticketTxt}</div>${obsTicket}</div>`;
+    if (atual) html += `
+    <div class="bcard" style="background:var(--dark);color:#fff;"><div class="t" style="color:var(--mint);">Bônus do time no mês (parcial)</div>
+      <div class="big" style="color:var(--mint);">${fmtBRL2(m.bonus)}</div>
+      <div class="small" style="color:#9dc4b8;">Soma dos bônus parciais individuais dos SDRs</div></div>`;
+  }
+  document.getElementById('bonus').innerHTML = html;
+
+  const T = vista.totais;
+  document.getElementById('totais').innerHTML = [
+    [T.leads,'Leads trabalhados (total)'],[T.reunioes,'Reuniões marcadas (total)'],
+    [T.taxa!==null?T.taxa+'%':'—','Taxa de marcação média'],[T.atividades,'Atividades (Tentativas de Contato) (total)'],
+    [T.assinados,'Contratos assinados (total)'],[fmtBRL(T.valor_assinado),'Valor contratos assinados (total)'],
+    [T.validados,'Contratos validados (total)'],[fmtBRL(T.valor_validado),'Valor contratos validados (total)'],
+  ].map(([v,l])=>`<div class="total"><div class="big" style="font-size:22px;">${v}</div><div class="small">${l}</div></div>`).join('');
+}
+
+function renderCharts(){
+  charts.forEach(c=>c.destroy()); charts = [];
+  const s = vista.serie, labels = s.map(m=>m.label);
+  charts.push(new Chart(document.getElementById('chartRM'),{type:'bar',
+   data:{labels,datasets:[
+    {label:'Ticket médio (R$)',data:s.map(m=>m.ticket),type:'line',order:0,
+     borderColor:'#083B31',backgroundColor:'#083B31',tension:.3,spanGaps:true,yAxisID:'y1'},
+    {label:'Atividades',data:s.map(m=>m.atividades),type:'line',order:1,
+     borderColor:'#5C7268',backgroundColor:'#5C7268',tension:.3,borderDash:[6,4],yAxisID:'y2'},
+    {label:'Reuniões marcadas',data:s.map(m=>m.reunioes),order:2,backgroundColor:'#00C896',borderRadius:6}]},
+   options:{responsive:true,plugins:{title:{display:true,text:'Reuniões marcadas × Ticket médio por mês'}},
+    scales:{y:{beginAtZero:true,title:{display:true,text:'Reuniões'}},
+     y1:{beginAtZero:true,position:'right',grid:{drawOnChartArea:false},title:{display:true,text:'Ticket médio (R$)'}},
+     y2:{display:false,beginAtZero:true}}}}));
+  charts.push(new Chart(document.getElementById('chartValores'),{type:'bar',
+   data:{labels,datasets:[
+    {label:'Valor contratos assinados',data:s.map(m=>m.valor_assinado),backgroundColor:'#0D5C47',borderRadius:6},
+    {label:'Valor contratos validados',data:s.map(m=>m.valor_validado),backgroundColor:'#00C896',borderRadius:6}]},
+   options:{responsive:true,plugins:{title:{display:true,text:'Valor de contratos assinados e validados por mês (R$)'}},
+    scales:{y:{beginAtZero:true,ticks:{callback:v=>v.toLocaleString('pt-BR')}}}}}));
+  charts.push(new Chart(document.getElementById('chartQtd'),{type:'bar',
+   data:{labels,datasets:[
+    {label:'Contratos assinados',data:s.map(m=>m.assinados),backgroundColor:'#0D5C47',borderRadius:6},
+    {label:'Contratos validados',data:s.map(m=>m.validados),backgroundColor:'#00C896',borderRadius:6}]},
+   options:{responsive:true,plugins:{title:{display:true,text:'Contratos assinados e validados por mês (qtd)'}},
+    scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}}));
+}
+
+selSdr.addEventListener('change', ()=>{ vista = D.vistas.find(v=>v.id===selSdr.value); fillMeses(); render(); renderCharts(); });
+selMes.addEventListener('change', render);
+fillMeses(); render(); renderCharts();
+document.getElementById('rodape').textContent = `Dados: tabela-mestre Odoo + Onboarding · gerado em ${D.gerado_em}`;
+</script>
+</body>
+</html>
