@@ -41,6 +41,24 @@ select{background:var(--med);color:#fff;border:1px solid var(--mint);border-radi
 canvas{max-height:300px;}
 .chart-wrap{background:#fff;border-radius:12px;padding:14px;margin-top:12px;}
 footer{color:#6f978a;font-size:12px;text-align:center;margin-top:10px;}
+
+/* ===== NOVA SECAO: ligacoes e atividades ===== */
+.ligbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+.chips{display:flex;gap:6px;background:#fff;border-radius:10px;padding:4px;}
+.chips button{border:0;background:transparent;color:var(--sub);font-size:13px;font-weight:bold;
+  padding:7px 13px;border-radius:8px;cursor:pointer;font-family:inherit;transition:.15s;}
+.chips button:hover{color:var(--dark);}
+.chips button.on{background:var(--dark);color:var(--mint);}
+.selp{background:#fff;color:var(--txt);border:1px solid #C5E8DF;border-radius:10px;padding:8px 12px;font-size:14px;cursor:pointer;}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+@media(max-width:760px){.tiles{grid-template-columns:repeat(2,1fr);}}
+.tile{background:#fff;border-radius:12px;padding:15px 16px;}
+.tile .n{font-size:27px;font-weight:bold;color:var(--dark);line-height:1.1;}
+.tile .lb{font-size:12.5px;color:var(--txt);margin-top:3px;font-weight:bold;}
+.tile .pd{font-size:16px;font-weight:bold;color:var(--med);margin-top:9px;line-height:1.2;}
+.tile .pd span{font-size:11.5px;font-weight:normal;color:var(--sub);display:block;margin-top:1px;}
+.metric{margin-bottom:10px;display:inline-flex;}
+.nota{font-size:11.5px;color:var(--sub);margin-top:10px;line-height:1.6;}
 @media(max-width:600px){h1{font-size:24px}.kpi .v{font-size:24px}}
 </style>
 </head>
@@ -67,13 +85,39 @@ footer{color:#6f978a;font-size:12px;text-align:center;margin-top:10px;}
   <h2>Histórico</h2>
   <div class="grid" id="totais"></div>
   <div class="chart-wrap"><canvas id="chartRM"></canvas></div>
+</div>
+
+<div class="section" id="secLig">
+  <h2>Ligações e atividades</h2>
+
+  <div class="ligbar">
+    <div class="chips" id="ligGran">
+      <button data-g="mes" class="on">Mês</button>
+      <button data-g="ano">Ano</button>
+    </div>
+    <select class="selp" id="ligPeriodo"></select>
+  </div>
+
+  <div class="tiles" id="ligTiles"></div>
+
+  <div class="chips metric" id="ligMetric">
+    <button data-m="A" class="on">Atividades / Ligações</button>
+    <button data-m="B">Ligações (+30s) / Tempo em Linha</button>
+  </div>
+
+  <div class="chart-wrap" style="height:320px;"><canvas id="chartLig"></canvas></div>
+  <div class="nota" id="ligNota"></div>
+</div>
+
+<div class="section">
+  <h2>Histórico de contratos</h2>
   <div class="chart-wrap"><canvas id="chartValores"></canvas></div>
   <div class="chart-wrap"><canvas id="chartQtd"></canvas></div>
 </div>
 <footer id="rodape"></footer>
 </div>
 <script>
-const D = {"titulo": "Camila", "mes_atual": "2026-09", "gerado_em": "01/09/2026 09:45", "padrao": "camila", "vistas": [{"id": "camila", "nome": "Camila", "is_geral": false, "serie": [{"mes": "2026-03", "label": "mar/2026", "leads": 7, "reunioes": 0, "assinados": 0, "validados": 0, "atividades": 0, "taxa": 0.0, "ticket": null, "fator": null, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}, {"mes": "2026-04", "label": "abr/2026", "leads": 2, "reunioes": 0, "assinados": 0, "validados": 0, "atividades": 0, "taxa": 0.0, "ticket": null, "fator": null, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}, {"mes": "2026-05", "label": "mai/2026", "leads": 1, "reunioes": 0, "assinados": 0, "validados": 0, "atividades": 0, "taxa": 0.0, "ticket": null, "fator": null, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}, {"mes": "2026-06", "label": "jun/2026", "leads": 0, "reunioes": 0, "assinados": 0, "validados": 0, "atividades": 0, "taxa": null, "ticket": null, "fator": null, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}, {"mes": "2026-07", "label": "jul/2026", "leads": 142, "reunioes": 10, "assinados": 1, "validados": 1, "atividades": 520, "taxa": 7.0, "ticket": 6786.56, "fator": 1.25, "valor_assinado": 5472.01, "valor_validado": 5472.01, "bonus_reunioes": 250, "bonus_fechamentos": 0, "bonus": 312.5}, {"mes": "2026-08", "label": "ago/2026", "leads": 188, "reunioes": 20, "assinados": 0, "validados": 0, "atividades": 448, "taxa": 10.6, "ticket": 5396.38, "fator": 1.25, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 750, "bonus_fechamentos": 0, "bonus": 937.5}, {"mes": "2026-09", "label": "set/2026", "leads": 0, "reunioes": 0, "assinados": 0, "validados": 0, "atividades": 0, "taxa": null, "ticket": null, "fator": null, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}], "totais": {"leads": 340, "reunioes": 30, "assinados": 1, "validados": 1, "valor_assinado": 5472.01, "valor_validado": 5472.01, "atividades": 968, "taxa": 8.8}}]};
+const D = {"titulo": "Camila", "mes_atual": "2026-09", "gerado_em": "01/09/2026 18:25", "padrao": "camila", "ligacoes_ate": "01/09/2026", "vistas": [{"id": "camila", "nome": "Camila", "is_geral": false, "serie": [{"mes": "2026-03", "label": "mar/2026", "leads": 7, "reunioes": 0, "assinados": 0, "validados": 0, "atividades": 0, "taxa": 0.0, "ticket": null, "fator": null, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}, {"mes": "2026-04", "label": "abr/2026", "leads": 2, "reunioes": 0, "assinados": 0, "validados": 0, "atividades": 0, "taxa": 0.0, "ticket": null, "fator": null, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}, {"mes": "2026-05", "label": "mai/2026", "leads": 1, "reunioes": 0, "assinados": 0, "validados": 0, "atividades": 0, "taxa": 0.0, "ticket": null, "fator": null, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}, {"mes": "2026-06", "label": "jun/2026", "leads": 0, "reunioes": 0, "assinados": 0, "validados": 0, "atividades": 0, "taxa": null, "ticket": null, "fator": null, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}, {"mes": "2026-07", "label": "jul/2026", "leads": 142, "reunioes": 10, "assinados": 1, "validados": 1, "atividades": 520, "taxa": 7.0, "ticket": 6786.56, "fator": 1.25, "valor_assinado": 5472.01, "valor_validado": 5472.01, "bonus_reunioes": 250, "bonus_fechamentos": 0, "bonus": 312.5}, {"mes": "2026-08", "label": "ago/2026", "leads": 188, "reunioes": 20, "assinados": 0, "validados": 0, "atividades": 448, "taxa": 10.6, "ticket": 5396.38, "fator": 1.25, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 750, "bonus_fechamentos": 0, "bonus": 937.5}, {"mes": "2026-09", "label": "set/2026", "leads": 0, "reunioes": 0, "assinados": 0, "validados": 0, "atividades": 0, "taxa": null, "ticket": null, "fator": null, "valor_assinado": 0.0, "valor_validado": 0.0, "bonus_reunioes": 0, "bonus_fechamentos": 0, "bonus": 0.0}], "totais": {"leads": 340, "reunioes": 30, "assinados": 1, "validados": 1, "valor_assinado": 5472.01, "valor_validado": 5472.01, "atividades": 968, "taxa": 8.8}, "serie_diaria": [["2026-06-30", 0, 4, 3, 5.8], ["2026-07-01", 10, 52, 8, 9.2], ["2026-07-02", 11, 100, 5, 9.8], ["2026-07-03", 12, 110, 7, 11.6], ["2026-07-06", 19, 126, 6, 10.0], ["2026-07-07", 26, 100, 10, 28.2], ["2026-07-08", 24, 89, 3, 8.2], ["2026-07-10", 15, 132, 3, 9.7], ["2026-07-13", 23, 97, 5, 19.1], ["2026-07-14", 41, 183, 7, 14.2], ["2026-07-15", 19, 89, 8, 13.2], ["2026-07-16", 30, 111, 6, 10.5], ["2026-07-17", 9, 35, 5, 10.9], ["2026-07-20", 20, 101, 6, 10.2], ["2026-07-21", 22, 101, 5, 14.9], ["2026-07-22", 19, 88, 5, 15.0], ["2026-07-23", 24, 144, 4, 9.5], ["2026-07-24", 41, 210, 13, 25.4], ["2026-07-27", 36, 162, 9, 19.0], ["2026-07-28", 34, 116, 15, 28.1], ["2026-07-29", 27, 116, 18, 20.8], ["2026-07-30", 15, 64, 7, 17.2], ["2026-07-31", 25, 109, 7, 16.9], ["2026-08-03", 17, 100, 10, 17.4], ["2026-08-04", 30, 99, 11, 25.6], ["2026-08-05", 16, 79, 12, 15.7], ["2026-08-06", 3, 6, 4, 8.6], ["2026-08-07", 4, 10, 4, 6.8], ["2026-08-10", 38, 86, 11, 22.2], ["2026-08-11", 26, 133, 8, 15.6], ["2026-08-12", 21, 106, 7, 12.6], ["2026-08-13", 28, 142, 11, 18.3], ["2026-08-14", 40, 140, 17, 22.2], ["2026-08-17", 0, 122, 7, 10.8], ["2026-08-18", 16, 119, 13, 23.1], ["2026-08-19", 24, 155, 10, 22.9], ["2026-08-20", 14, 77, 4, 15.0], ["2026-08-21", 10, 57, 6, 21.6], ["2026-08-24", 15, 155, 13, 23.8], ["2026-08-25", 20, 128, 6, 13.0], ["2026-08-26", 25, 98, 5, 15.1], ["2026-08-27", 29, 93, 5, 14.7], ["2026-08-28", 20, 92, 17, 32.2], ["2026-08-29", 5, 11, 2, 2.9], ["2026-08-31", 29, 112, 10, 16.1], ["2026-09-01", 0, 50, 7, 11.3]]}]};
 const fmtBRL = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
 const fmtBRL2 = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const selSdr = document.getElementById('selSdr');
@@ -186,9 +230,157 @@ function renderCharts(){
     scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}}));
 }
 
-selSdr.addEventListener('change', ()=>{ vista = D.vistas.find(v=>v.id===selSdr.value); fillMeses(); render(); renderCharts(); });
+selSdr.addEventListener('change', ()=>{ vista = D.vistas.find(v=>v.id===selSdr.value); fillMeses(); render(); renderCharts(); atualizaLig(); });
 selMes.addEventListener('change', render);
 fillMeses(); render(); renderCharts();
+
+/* ================= NOVA SECAO: ligacoes e atividades ================= */
+const MET = {
+  ati:{nome:'Atividades',      cor:'#0D5C47', un:''},
+  lig:{nome:'Ligações',        cor:'#00C896', cor2:'#00805F', un:''},
+  cnv:{nome:'Ligações (+30s)', cor:'#0D5C47', un:''},
+  min:{nome:'Tempo em Linha',  cor:'#00C896', cor2:'#00805F', un:' min'},
+};
+const PARES = {
+  A:{ids:['ati','lig'], titulo:'Atividades e Ligações'},
+  B:{ids:['cnv','min'], titulo:'Ligações (+30s) e Tempo em Linha'},
+};
+const MESES_L=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+let gran='mes', par='A', chartLig=null;
+
+const br = (v,d=0) => v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtMin = v => v>=120 ? Math.floor(v/60)+'h'+String(Math.round(v%60)).padStart(2,'0') : br(Math.round(v))+' min';
+const fmtVal = (v,m) => m==='min' ? fmtMin(v) : br(Math.round(v));
+
+function periodos(){
+  const S = vista.serie_diaria||[]; if(!S.length) return [];
+  const set=new Map();
+  if(gran==='mes'){
+    S.forEach(r=>{const k=r[0].slice(0,7);
+      if(!set.has(k)) set.set(k,{id:k,label:MESES_L[+k.slice(5,7)-1]+'/'+k.slice(0,4)});});
+  } else {
+    S.forEach(r=>{const k=r[0].slice(0,4); if(!set.has(k)) set.set(k,{id:k,label:'Ano de '+k});});
+  }
+  return [...set.values()].reverse();
+}
+
+function baldes(pid){
+  /* dias_ati / dias_lig contam os dias COM registro de cada fonte — as ligações
+     só existem a partir de mai/2026, então a média por dia não pode dividir
+     pelos dias em que só havia atividade. */
+  const S = vista.serie_diaria||[];
+  if(gran==='mes'){
+    return S.filter(r=>r[0].slice(0,7)===pid)
+            .map(r=>({lab:String(+r[0].slice(8,10)),ati:r[1],lig:r[2],cnv:r[3],min:r[4],
+                      dias_ati:r[1]>0?1:0, dias_lig:r[2]>0?1:0}));
+  }
+  const acc={};
+  S.filter(r=>r[0].slice(0,4)===pid).forEach(r=>{
+    const m=+r[0].slice(5,7)-1;
+    acc[m]=acc[m]||{lab:MESES_L[m],ati:0,lig:0,cnv:0,min:0,dias_ati:0,dias_lig:0};
+    acc[m].ati+=r[1];acc[m].lig+=r[2];acc[m].cnv+=r[3];acc[m].min+=r[4];
+    if(r[1]>0) acc[m].dias_ati++; if(r[2]>0) acc[m].dias_lig++;});
+  return Object.keys(acc).sort((a,b)=>a-b).map(k=>acc[k]);
+}
+const soma = (bs,m)=>bs.reduce((a,b)=>a+b[m],0);
+
+function renderLig(){
+  const sel=document.getElementById('ligPeriodo');
+  const bs=baldes(sel.value);
+
+  document.getElementById('ligTiles').innerHTML = ['ati','lig','cnv','min'].map(m=>{
+    /* a media por dia divide pelos dias em que AQUELA metrica tem registro:
+       ligacoes so existem a partir de mai/2026, entao dividir por todos os dias
+       do periodo achataria o numero sem motivo */
+    const tot=soma(bs,m);
+    const base = soma(bs, m==='ati' ? 'dias_ati' : 'dias_lig');
+    const med = base ? tot/base : 0;
+    const pd = m==='min' ? br(Math.round(med))+' min' : br(med, med<10?1:0);
+    return `<div class="tile"><div class="n">${fmtVal(tot,m)}</div>
+            <div class="lb">${MET[m].nome}</div>
+            <div class="pd">${pd}<span>por dia</span></div></div>`;
+  }).join('');
+
+  const ids=PARES[par].ids, labels=bs.map(b=>b.lab);
+  const eixos=['y','y1'];
+  const ds=ids.map((m,i)=>({label:MET[m].nome,data:bs.map(b=>b[m]),backgroundColor:MET[m].cor,
+    borderRadius:4,maxBarThickness:34,categoryPercentage:.76,barPercentage:.9,
+    yAxisID:eixos[i],__m:m}));
+
+  if(chartLig) chartLig.destroy();
+  chartLig=new Chart(document.getElementById('chartLig'),{type:'bar',data:{labels,datasets:ds},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{position:'top',labels:{boxWidth:12,boxHeight:12,color:'#1A2E28',
+                font:{size:13,weight:'bold'},usePointStyle:false,padding:16}},
+        title:{display:true,text:PARES[par].titulo+' por '+(gran==='ano'?'mês':'dia'),
+               color:'#083B31',font:{size:14,weight:'bold'},padding:{bottom:12}},
+        tooltip:{backgroundColor:'#083B31',padding:10,
+          callbacks:{label:c=>' '+c.dataset.label+': '+fmtVal(c.parsed.y,c.dataset.__m)}}},
+      scales:{
+        x:{grid:{display:false},ticks:{color:'#5C7268'},border:{color:'#D8E9E2'}},
+        y:{position:'left',beginAtZero:true,grid:{color:'#E9F2EE'},border:{display:false},
+           ticks:{color:MET[ids[0]].cor,font:{weight:'bold'},precision:0,callback:v=>br(v)},
+           title:{display:true,text:MET[ids[0]].nome,color:MET[ids[0]].cor,font:{size:12,weight:'bold'}}},
+        y1:{position:'right',beginAtZero:true,grid:{display:false},border:{display:false},
+           ticks:{color:MET[ids[1]].cor2||MET[ids[1]].cor,font:{weight:'bold'},precision:0,
+                  callback:v=>br(v)},
+           title:{display:true,text:MET[ids[1]].nome,color:MET[ids[1]].cor2||MET[ids[1]].cor,
+                  font:{size:12,weight:'bold'}}}}}});
+
+  document.getElementById('ligNota').innerHTML =
+    '<b>Atividades</b>: tentativas de contato registradas no CRM, sem duplicata do mesmo lead em menos de 60s. &nbsp;·&nbsp; '+
+    '<b>Ligações</b>: discagens agrupadas por chamada, descartando as em formato inválido. &nbsp;·&nbsp; '+
+    '<b>Ligações (+30s)</b>: atendidas com 30 segundos ou mais de conversa. &nbsp;·&nbsp; '+
+    '<b>Tempo em Linha</b>: minutos efetivamente falados.<br>'+
+    (D.ligacoes_ate?'':'') + 'Cada barra tem sua própria escala — a da esquerda vale para '+MET[PARES[par].ids[0]].nome+
+    ' e a da direita para '+MET[PARES[par].ids[1]].nome+'; compare cada série com ela mesma ao longo dos dias, não a altura de uma com a da outra. '+
+    'Clique na legenda para tirar uma das barras da análise.' +
+    (D.ligacoes_ate ? ' Ligações atualizadas até <b>'+D.ligacoes_ate+'</b>.' : '');
+}
+
+function temLigacoes(){ return (vista.serie_diaria||[]).length>0; }
+
+function fillPeriodos(){
+  const sel=document.getElementById('ligPeriodo'), P=periodos();
+  sel.innerHTML=''; P.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.label;sel.appendChild(o);});
+  if(P.length) sel.value=P[0].id;
+}
+document.getElementById('ligGran').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  [...e.currentTarget.children].forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  gran=b.dataset.g; fillPeriodos(); renderLig();});
+document.getElementById('ligMetric').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  [...e.currentTarget.children].forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  par=b.dataset.m; renderLig();});
+document.getElementById('ligPeriodo').addEventListener('change',renderLig);
+function atualizaLig(){
+  const sec=document.getElementById('secLig');
+  if(!temLigacoes()){ sec.style.display='none'; return; }
+  sec.style.display=''; fillPeriodos(); renderLig();
+  sincronizaComMesGeral();   /* nasce no mesmo mês do seletor do topo */
+}
+
+/* Quando o seletor de mês do topo (visão geral da página) muda, a seção de
+   ligações acompanha. Não é vínculo travado: mexer no seletor da seção não
+   mexe no resto da página, e um mês sem ligações não move nada. */
+function sincronizaComMesGeral(){
+  if(!temLigacoes()) return;
+  const alvo = selMes.value;
+  if(!(vista.serie_diaria||[]).some(r=>r[0].slice(0,7)===alvo)) return;
+  if(gran!=='mes'){
+    gran='mes';
+    [...document.getElementById('ligGran').children]
+      .forEach(b=>b.classList.toggle('on', b.dataset.g==='mes'));
+    fillPeriodos();
+  }
+  document.getElementById('ligPeriodo').value = alvo;
+  renderLig();
+}
+selMes.addEventListener('change', sincronizaComMesGeral);
+atualizaLig();
+
 document.getElementById('rodape').textContent = `Dados: tabela-mestre Odoo + Onboarding · gerado em ${D.gerado_em}`;
 </script>
 </body>
